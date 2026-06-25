@@ -1,0 +1,14 @@
+# Never commit downloaded media or tool binaries
+*.mp4
+*.mkv
+*.webm
+*.part
+*.m4a
+*.mp3
+*.zip
+*.exe
+*.7z
+
+# OS / editor noise
+Thumbs.db
+.DS_Store
