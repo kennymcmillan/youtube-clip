@@ -100,6 +100,13 @@ deliberately if you want it shared via cloud storage.
   `Install-Tools.ps1`, or pass `--ffmpeg-location`.
 - `Sign in to confirm you are not a bot` -> you are on a datacenter IP. Run from the laptop, or add
   `--cookies-from-browser chrome`.
+- `Error reading HTTP response: End of file` during a section download, usually with a
+  `No supported JavaScript runtime` warning -> yt-dlp fell back to YouTube's `android_vr` client
+  (AV1-only) and the AV1 byte-range fetch dropped. Give it a JS runtime so it uses the web client +
+  H.264: add `--js-runtimes node` (node is installed on the laptop). If it still drops, the source
+  is likely a multi-hour livestream/court-day stream; section-fetching a window out of a huge file
+  is unreliable over the TLS proxy - use a single-match upload, or download the whole file with the
+  native downloader and cut the section locally with ffmpeg.
 - Slow download -> YouTube throttles some client APIs. It still completes; let it run in the
   background. Lower `-Quality` to speed it up.
 - A few seconds extra at the start of the clip -> normal. The cut starts at the nearest keyframe.

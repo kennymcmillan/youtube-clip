@@ -200,3 +200,61 @@ py -3.12 -u scripts\extract_rallies_v2.py "match.mp4" [--dry-run]
 `--audio` re-enables the experimental audio overrides; `--no-motion` / `--no-veto` /
 `--no-rescue` isolate cues for A/B testing. A `<out>.debug.csv` of every per-frame cue track is
 always written for inspection.
+
+### 2026-06-26 — Audio cue tuned and rigorously re-tested: NEGATIVE result
+
+Followed the two research-suggested fixes and measured them properly with a probe that scores
+each candidate audio feature against the visual-keep labels by rank-AUC (0.5 = no separation):
+
+| audio feature | median (live) | median (dead) | AUC |
+|---|---|---|---|
+| full-band onset density | 0.80/s | 0.80/s | 0.510 |
+| high-freq-band onset density (>3 kHz) | 0.40/s | 0.40/s | 0.510 |
+| impact-train periodicity (autocorr 0.4-2.5 s) | 0.208 | 0.195 | 0.531 |
+| HF density x periodicity | 0.075 | 0.077 | 0.518 |
+
+All four are ~coin-toss. Band-limiting to the pock band and scoring impact regularity did NOT
+help on this broadcast. Most likely cause: the Arab Padel Tour feed has commentary + ambient
+running throughout, so the ball strike never stands proud of the bed. Caveat: scored against
+the visual-keep proxy, not hand-labelled rallies (court camera includes serve-prep pauses;
+replays carry ball sounds), so this understates true audio signal somewhat — but four features
+near 0.5 is strong evidence there is no cheap audio win on a commentated broadcast.
+
+**Decision:** drop audio from the default path (already opt-in). Do NOT invest more in onset-based
+audio. If audio is revisited, the only routes with a chance are (a) a clean court-mic feed rather
+than the mixed broadcast, or (b) a learned audio-event model (YAMNet applause for point-END
+boundary snapping, not a keep/drop gate) - a bigger lift with uncertain payoff. Structural Phase 1
+is the product; audio is shelved with the evidence recorded.
+
+### 2026-06-26 — Colour-invariance PROVEN (controlled recolour experiment)
+
+Goal: show the structural cue is colour-blind where the v1 colour cue is not. A genuine second
+tournament was the intended test bed, but every YouTube pull of the candidate (a 6.5-hour Premier
+Padel court-day stream) failed at ffmpeg's byte-range stage over the corporate TLS proxy - a
+delivery/network limit on a huge file, not a tooling bug (see the gotcha note below). So the test
+was run as a controlled experiment on the Hassan Waly footage, which is stronger anyway because it
+isolates colour as the only variable: learn the court reference on the ORIGINAL court colour, then
+hue-shift the court (= a different tournament) and re-test the SAME live frames.
+
+| court recolour | STRUCTURAL still recognises court | COLOUR still recognises court |
+|---|---|---|
+| baseline (no shift) | (dist 0.089) | (sim 0.984) |
+| hue +60 deg  | **91.6%** (dist 0.184) | **0.0%** (sim 0.446) |
+| hue +120 deg | **99.6%** (dist 0.089) | **0.0%** (sim 0.468) |
+| hue +180 deg | **99.2%** (dist 0.122) | **0.0%** (sim 0.494) |
+
+A court reference learned on one colour transfers to a different court colour structurally
+(>90%) but not chromatically (0%). This is the cross-tournament robustness claim, confirmed.
+(End-to-end on a real second broadcast still worth doing if a single-match upload URL is supplied;
+the giant-stream download is the only thing that blocked it.)
+
+### yt-dlp gotcha found while sourcing a second match
+
+Two stacking problems on the corporate laptop, worth remembering:
+1. yt-dlp warned "No supported JavaScript runtime" and fell back to YouTube's `android_vr` client,
+   which only serves **AV1** video; section-fetching AV1 over the TLS proxy died with
+   `Error reading HTTP response: End of file`. Fix: `--js-runtimes node` (node is installed) so
+   yt-dlp uses the web client and offers H.264.
+2. Even with H.264, section-fetching a window out of a **6.5-hour** stream kept dropping. Lesson:
+   for a quick test clip, prefer a **single-match upload** (not a multi-hour court-day livestream),
+   or download the whole file with the native downloader and cut locally.
