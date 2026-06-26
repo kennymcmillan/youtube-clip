@@ -9,6 +9,10 @@
 *.exe
 *.7z
 
+# Python bytecode
+__pycache__/
+*.pyc
+
 # OS / editor noise
 Thumbs.db
 .DS_Store
