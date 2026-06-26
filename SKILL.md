@@ -1,6 +1,6 @@
 ---
 name: youtube-clip
-description: Download a YouTube video, or clip a precise time-section out of a long stream, into a local MP4. Use when the user shares a YouTube/youtu.be link and wants to save it, grab one game/match/segment out of a multi-hour livestream, get footage off YouTube for analysis or review, or says "download this video", "clip from X to Y", "extract the section", "get it off YouTube", or hits YouTube SSL / bot-blocking. Handles corporate-network gotchas (TLS-inspecting VPN/firewall breaking yt-dlp and ffmpeg) and explains YouTube datacenter-IP bot-blocking.
+description: Download a YouTube video, or clip a precise time-section out of a long stream, into a local MP4. Use when the user shares a YouTube/youtu.be link and wants to save it, grab one game/match/segment out of a multi-hour livestream, get footage off YouTube for analysis or review, or says "download this video", "clip from X to Y", "extract the section", "get it off YouTube", or hits YouTube SSL / bot-blocking. Handles corporate-network gotchas (TLS-inspecting VPN/firewall breaking yt-dlp and ffmpeg) and explains YouTube datacenter-IP bot-blocking. Also strips the dead time out of a downloaded racket-sport match (padel/tennis/squash), keeping only the live court-camera rallies and dropping replays/crowd/graphics/ad breaks, when the user says "cut the rallies out", "remove the dead time", "only the on-court action", "rallies only", "make a highlights cut", or "extract the play".
 ---
 
 # YouTube Clip / Download
