@@ -116,6 +116,29 @@ command so it borrows your logged-in YouTube session.
 
 ---
 
+## 7b. Cut the dead time out of a match (rally extractor)
+
+Got a full match and only want the rallies? `Extract-Rallies.ps1` keeps the live court-camera
+footage and throws away the bits between points (replays, close-ups, crowd shots, score graphics,
+ad breaks). It works it out from the picture itself, so there is nothing to set up, label, or train.
+
+```powershell
+# 1. (optional) preview the cut - writes a list of the bits it will keep, renders nothing
+powershell -File scripts\Extract-Rallies.ps1 "C:\path\to\match.mp4" -DryRun
+
+# 2. make the play-only file
+powershell -File scripts\Extract-Rallies.ps1 "C:\path\to\match.mp4"
+```
+
+You get `match_rallies.mp4` next to the original, plus a `..._rallies.mp4.segments.csv` listing every
+kept clip with timestamps so you can skip straight to any rally. On one 93-minute padel match it
+produced 39 minutes of rallies (171 clips) and shrank the file from 2.3 GB to under 1 GB in about a
+minute. It needs the same ffmpeg you already installed in step 2, nothing else.
+
+If a particular broadcast keeps too much or too little, two dials help: `-Threshold 0.7` (higher keeps
+less), or `-RefTime 270` to point it at a second in the video you know is a live rally. Always preview
+with `-DryRun` on a new channel before trusting it.
+
 ## 8. Using it inside Claude Code (optional)
 
 This repo is also a Claude Code skill. To let Claude run it for you, copy the whole folder to your
